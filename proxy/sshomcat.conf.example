@@ -1,0 +1,39 @@
+# SSHomcat example Apache vhost config
+#
+# Requires: mod_ssl, mod_proxy, mod_proxy_http, mod_proxy_wstunnel, mod_headers
+# Enable on Debian/Ubuntu with:
+#   a2enmod ssl proxy proxy_http proxy_wstunnel headers
+#
+# Tomcat must bind its HTTP connector to 127.0.0.1 only -- Apache is the sole
+# public entry point. See ../docs/security.md.
+
+<VirtualHost *:80>
+    ServerName sshomcat.example.com
+    Redirect permanent / https://sshomcat.example.com/
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName sshomcat.example.com
+
+    SSLEngine on
+    SSLCertificateFile      /etc/ssl/certs/sshomcat.crt
+    SSLCertificateKeyFile   /etc/ssl/private/sshomcat.key
+    # SSLCertificateChainFile /etc/ssl/certs/sshomcat-chain.crt
+
+    # Static frontend
+    DocumentRoot /var/www/sshomcat/frontend
+    <Directory /var/www/sshomcat/frontend>
+        Require all granted
+    </Directory>
+
+    # Backend health/API -- plain HTTP proxy to Tomcat, localhost only
+    ProxyPass        "/api/" "http://127.0.0.1:8080/api/"
+    ProxyPassReverse "/api/" "http://127.0.0.1:8080/api/"
+
+    # WebSocket bridge -- mod_proxy_wstunnel handles the ws:// scheme directly
+    ProxyPass        "/ws/" "ws://127.0.0.1:8080/ws/"
+    ProxyPassReverse "/ws/" "ws://127.0.0.1:8080/ws/"
+
+    ErrorLog  ${APACHE_LOG_DIR}/sshomcat-error.log
+    CustomLog ${APACHE_LOG_DIR}/sshomcat-access.log combined
+</VirtualHost>

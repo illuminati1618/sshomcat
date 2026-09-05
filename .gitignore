@@ -1,0 +1,24 @@
+# Java / Maven
+backend/target/
+*.class
+*.war
+*.jar
+
+# Node (only if a bundler ever gets added to frontend/)
+frontend/node_modules/
+frontend/dist/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS cruft
+desktop.ini
+Thumbs.db
+.DS_Store
+
+# Real deployment config -- never commit real target host/credentials.
+# Ship a `*.example` version instead (see docs/security.md).
+backend/src/main/resources/sshomcat.properties
+proxy/sshomcat.conf
