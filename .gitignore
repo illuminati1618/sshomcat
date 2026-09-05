@@ -22,3 +22,8 @@ Thumbs.db
 # Ship a `*.example` version instead (see docs/security.md).
 backend/src/main/resources/sshomcat.properties
 proxy/sshomcat.conf
+
+# Local dev/test stack (docker-compose.dev.yml) -- values are throwaway/local-only, but follow
+# the same "real config isn't committed" convention as above.
+docker/dev/sshomcat.properties
+docker/dev/certs/

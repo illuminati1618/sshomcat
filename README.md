@@ -9,12 +9,13 @@ a live shell, rendered with [xterm.js](https://xtermjs.org/).
 
 ## Status
 
-📋 **Planning stage.** Nothing has been built yet. This repo currently holds the full design
-plus a starter folder structure. **If you're an agent picking this up: start with
-[`docs/architecture.md`](docs/architecture.md), then follow the build order in
-[`docs/roadmap.md`](docs/roadmap.md).** Together with [`docs/api.md`](docs/api.md) and
-[`docs/security.md`](docs/security.md), those four files are meant to be a complete spec —
-you shouldn't need anything else to start M1.
+✅ **M1 (MVP) built and verified end-to-end.** Frontend, backend, and proxy config all exist and
+have been run together against a real SSH server — see [`docs/roadmap.md`](docs/roadmap.md) for
+what was tested and how to reproduce it (`docker-compose.dev.yml`). **If you're an agent picking
+this up next: M1's checklist is done — start with [`docs/roadmap.md`](docs/roadmap.md) M2
+(hardening) unless told otherwise.** [`docs/architecture.md`](docs/architecture.md),
+[`docs/api.md`](docs/api.md), and [`docs/security.md`](docs/security.md) are still the spec —
+keep them in sync with any change in behavior.
 
 ## Why
 
@@ -41,10 +42,12 @@ Full detail, sequence diagram, and message protocol: [`docs/architecture.md`](do
 
 ```
 sshomcat/
-├── docs/       -- start here: architecture, API contract, security model, roadmap
-├── frontend/   -- xterm.js client (static site)
-├── backend/    -- Java/Tomcat WAR project (the SSH bridge)
-├── proxy/      -- Apache vhost config + example
+├── docs/                   -- start here: architecture, API contract, security model, roadmap
+├── frontend/               -- xterm.js client (static site)
+├── backend/                -- Java/Tomcat WAR project (the SSH bridge)
+├── proxy/                  -- Apache vhost config + example (production shape)
+├── docker/dev/             -- dev-only Apache image/config + throwaway TLS cert for local E2E testing
+├── docker-compose.dev.yml  -- spins up sshd + backend + Apache together for local testing
 └── README.md
 ```
 

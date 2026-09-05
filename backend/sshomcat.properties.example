@@ -1,0 +1,30 @@
+# SSHomcat backend configuration.
+#
+# Copy this file, fill in real values, and deploy it as WEB-INF/classes/sshomcat.properties
+# (or point -Dsshomcat.config=/path/to/it at it). NEVER commit the real file -- see .gitignore
+# and docs/security.md.
+
+# The one fixed SSH target this gateway bridges to. Never client-supplied -- see
+# docs/security.md before even considering changing that.
+target.host=localhost
+target.port=22
+
+# How long a session may sit with no WebSocket traffic in either direction before the
+# container closes it.
+session.idleTimeoutMs=600000
+
+# Hard cap on total session length, regardless of activity.
+session.maxDurationMs=3600000
+
+# How long a newly opened WebSocket has to send a valid `auth` message before it's closed.
+session.authGraceMs=5000
+
+# Timeouts for the backend's outbound SSH connection/auth attempt against the target.
+ssh.connectTimeoutMs=10000
+ssh.authTimeoutMs=10000
+
+# accept-all: trust whatever host key the target presents (local dev only -- see
+#             docs/security.md "Host key verification").
+# known-hosts: verify against ssh.knownHostsFile (OpenSSH known_hosts format).
+ssh.hostKeyVerification=accept-all
+#ssh.knownHostsFile=/etc/sshomcat/known_hosts

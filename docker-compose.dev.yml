@@ -1,0 +1,58 @@
+# Local end-to-end dev/test stack for docs/roadmap.md M1: browser -> Apache -> Tomcat -> a real
+# SSH server, all three components running as they would in production (see
+# docs/architecture.md), just containerized and on self-signed TLS instead of real certs/hosts.
+#
+# This is dev tooling, not a prescribed production deployment -- a real deployment runs Tomcat
+# and Apache as described in docs/architecture.md and proxy/sshomcat.conf.example.
+#
+# Usage (fresh clone -- docker/dev/sshomcat.properties and docker/dev/certs/ are gitignored,
+# see docs/security.md, so both need generating once):
+#   cp docker/dev/sshomcat.properties.example docker/dev/sshomcat.properties
+#   mkdir -p docker/dev/certs && cd docker/dev/certs
+#   openssl req -x509 -newkey rsa:2048 -keyout sshomcat.key -out sshomcat.crt -days 365 -nodes \
+#     -subj "/CN=localhost" \
+#     -addext "subjectAltName=DNS:localhost,IP:127.0.0.1" \
+#     -addext "basicConstraints=critical,CA:FALSE" \
+#     -addext "keyUsage=critical,digitalSignature,keyEncipherment" \
+#     -addext "extendedKeyUsage=serverAuth"
+#   cd ../../..
+#   docker compose -f docker-compose.dev.yml up --build
+#   open https://localhost:8443  (self-signed cert -- your browser will warn, that's expected)
+#   SSH login: demo / demo12345 (dev-only throwaway credentials, see below)
+
+services:
+  sshd:
+    image: lscr.io/linuxserver/openssh-server:latest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - PASSWORD_ACCESS=true
+      - USER_NAME=demo
+      - USER_PASSWORD=demo12345
+    networks: [sshomcat-dev]
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      - CATALINA_OPTS=-Dsshomcat.config=/config/sshomcat.properties
+    volumes:
+      - ./docker/dev/sshomcat.properties:/config/sshomcat.properties:ro
+    depends_on: [sshd]
+    networks: [sshomcat-dev]
+
+  apache:
+    build:
+      context: ./docker/dev
+      dockerfile: apache/Dockerfile
+    volumes:
+      - ./frontend:/usr/local/apache2/htdocs:ro
+    ports:
+      - "8443:443"
+      - "8080:80"
+    depends_on: [backend]
+    networks: [sshomcat-dev]
+
+networks:
+  sshomcat-dev: {}

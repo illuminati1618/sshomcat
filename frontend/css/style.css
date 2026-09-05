@@ -1,0 +1,134 @@
+:root {
+  color-scheme: dark;
+  --bg: #1e1e1e;
+  --panel: #252526;
+  --border: #3c3c3c;
+  --text: #d4d4d4;
+  --accent: #4ec9b0;
+  --error: #f14c4c;
+  --muted: #8a8a8a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.brand {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.status {
+  font-size: 0.8rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+
+.status-connected { color: var(--accent); border-color: var(--accent); }
+.status-connecting { color: #d7ba7d; border-color: #d7ba7d; }
+.status-disconnected { color: var(--muted); }
+.status-error { color: var(--error); border-color: var(--error); }
+
+main {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+#login-form {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+#login-form h1 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.hint {
+  margin: 0 0 0.5rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+#login-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+#login-form input {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+
+#login-form button {
+  margin-top: 0.5rem;
+  padding: 0.55rem;
+  border: none;
+  border-radius: 4px;
+  background: var(--accent);
+  color: #0d0d0d;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#login-form button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.error-message {
+  color: var(--error);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+#terminal-view {
+  align-self: stretch;
+  padding: 0.5rem;
+}
+
+#terminal {
+  width: 100%;
+  height: 100%;
+}

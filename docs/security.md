@@ -43,6 +43,26 @@ decision in this file as load-bearing, not optional polish.
 - **Unauthenticated sockets**: a WebSocket that never sends a valid `auth` message within a
   short grace period must be closed by the server, not held open indefinitely.
 
+## Host key verification (backend -> target)
+
+The constraints above cover the browser<->backend leg. The backend's own outbound SSH connection
+to the target also has a trust decision: does it verify the target's host key at all?
+
+`sshomcat.properties`'s `ssh.hostKeyVerification` controls this:
+
+- `accept-all` (the shipped default) trusts whatever host key the target presents, with no
+  pinning or `known_hosts` check. This is **local-dev-only** — it makes the backend->target leg
+  vulnerable to a man-in-the-middle that can position itself between the two (much harder in
+  practice than a browser-facing MITM, since the target is fixed and usually on a private
+  network, but not impossible).
+- `known-hosts` verifies against an OpenSSH-format `known_hosts` file (`ssh.knownHostsFile`).
+  Since the target is a single fixed host (docs/architecture.md), pinning its key costs nothing
+  operationally — there's no fleet of hosts to manage keys for.
+
+**Use `known-hosts` in any deployment beyond local dev.** `accept-all` shipping as the default is
+a deliberate "make it easy to try locally, but don't silently ship the honest gap" choice, not an
+endorsement — flag it in review if a PR moves toward real-world exposure without addressing this.
+
 ## Transport & deployment assumptions
 
 - Use real TLS certificates in any environment beyond local dev (Let's Encrypt or an internal

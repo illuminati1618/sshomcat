@@ -30,6 +30,11 @@
     ProxyPass        "/api/" "http://127.0.0.1:8080/api/"
     ProxyPassReverse "/api/" "http://127.0.0.1:8080/api/"
 
+    # mod_proxy's default proxy timeout is much shorter than a real terminal session sits idle
+    # for. Without this, Apache silently drops the WebSocket out from under an otherwise-healthy
+    # session. Should be >= the backend's session.idleTimeoutMs (sshomcat.properties).
+    ProxyTimeout 660
+
     # WebSocket bridge -- mod_proxy_wstunnel handles the ws:// scheme directly
     ProxyPass        "/ws/" "ws://127.0.0.1:8080/ws/"
     ProxyPassReverse "/ws/" "ws://127.0.0.1:8080/ws/"

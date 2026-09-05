@@ -7,21 +7,43 @@ it, without guessing what's in scope.
 
 Goal: a working end-to-end bridge, single hardcoded local target, run locally.
 
-- [ ] `backend/`: Maven WAR project skeleton, Tomcat 10.1.x target, Java 17+.
-- [ ] `backend/`: `/api/health` endpoint.
-- [ ] `backend/`: `/ws/ssh` WebSocket endpoint per [api.md](api.md), using Apache MINA SSHD to
+**Status: done.** Verified with scripted WebSocket clients driving the full
+`docker-compose.dev.yml` stack (Apache with TLS → Tomcat → a real `linuxserver/openssh-server`
+container):
+
+- login, `echo`, output round-tripped, `exit` closed the SSH session and the bridge tore down
+  the WebSocket with a normal close, with no lingering TCP connection on the sshd side afterward.
+- resize genuinely reaches the remote PTY, not just the local xterm instance -- checked with
+  `stty size` after both the initial post-connect resize and a simulated mid-session window
+  drag (`frontend/js/main.js` wires `term.onResize`, not just the browser's `resize` event, to
+  the outgoing `resize` message).
+- a ~20KB paste survives (exercises `Session.setMaxTextMessageBufferSize`, since Tomcat's 8KB
+  default is well under the 64KB protocol limit).
+- a long-running command with no further client keystrokes does *not* get killed by the idle
+  timeout -- confirmed the timer tracks outbound traffic too, not just inbound.
+- bad password, malformed JSON, a message sent before `auth`, and the auth-grace timeout all
+  close the socket correctly (1008/error-frame, no credential ever appearing in a log line).
+
+- [x] `backend/`: Maven WAR project skeleton, Tomcat 10.1.x target, Java 17+.
+- [x] `backend/`: `/api/health` endpoint.
+- [x] `backend/`: `/ws/ssh` WebSocket endpoint per [api.md](api.md), using Apache MINA SSHD to
       bridge to a configured target (`sshomcat.properties`: `target.host`, `target.port`).
-- [ ] `backend/`: PTY-backed shell channel, resize propagation, clean teardown on either side
+- [x] `backend/`: PTY-backed shell channel, resize propagation, clean teardown on either side
       closing.
-- [ ] `backend/`: idle timeout + max session duration (hardcode reasonable defaults, make
+- [x] `backend/`: idle timeout + max session duration (hardcode reasonable defaults, make
       configurable).
-- [ ] `frontend/`: login form (username/password) + xterm.js terminal, wired to the WS protocol
+- [x] `frontend/`: login form (username/password) + xterm.js terminal, wired to the WS protocol
       in [api.md](api.md).
-- [ ] `proxy/`: working Apache vhost (`sshomcat.conf.example`) with TLS, static file serving,
+- [x] `proxy/`: working Apache vhost (`sshomcat.conf.example`) with TLS, static file serving,
       and `/api` + `/ws` proxying.
-- [ ] End-to-end manual test: browser → Apache → Tomcat → a real local SSH server, full
+- [x] End-to-end manual test: browser → Apache → Tomcat → a real local SSH server, full
       interactive session (run a command, see output, resize the window, close the tab, confirm
-      the SSH session on the target actually ends).
+      the SSH session on the target actually ends). Reproducible via `docker-compose.dev.yml`
+      (dev-only stack, not the prescribed production shape) — see its header comment for usage.
+
+Known gap carried forward, not blocking M1: SSH host-key verification defaults to
+"accept-all" (`ssh.hostKeyVerification`), which is honest-but-insecure for anything beyond local
+dev — see docs/security.md "Host key verification".
 
 ## M2 — Hardening (do before any real-world / multi-user exposure)
 

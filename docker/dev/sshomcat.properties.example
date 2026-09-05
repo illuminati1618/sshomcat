@@ -1,0 +1,5 @@
+# Dev-only config for docker-compose.dev.yml. Copy to sshomcat.properties (gitignored) in this
+# same directory -- see ../../docs/security.md on why the real file never gets committed.
+target.host=sshd
+target.port=2222
+ssh.hostKeyVerification=accept-all

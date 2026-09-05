@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SSHomcat</title>
+  <link rel="stylesheet" href="vendor/xterm/xterm.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <span class="brand">SSHomcat</span>
+    <span id="status" class="status status-disconnected">disconnected</span>
+  </header>
+
+  <main>
+    <section id="login-view" class="panel">
+      <form id="login-form">
+        <h1>Sign in</h1>
+        <p class="hint">Credentials are sent straight through to the configured SSH server. Nothing
+          is stored.</p>
+        <label>
+          Username
+          <input type="text" id="username" name="username" autocomplete="username" required autofocus>
+        </label>
+        <label>
+          Password
+          <input type="password" id="password" name="password" autocomplete="current-password" required>
+        </label>
+        <button type="submit">Connect</button>
+        <p id="login-error" class="error-message" hidden></p>
+      </form>
+    </section>
+
+    <section id="terminal-view" class="panel" hidden>
+      <div id="terminal"></div>
+    </section>
+  </main>
+
+  <script src="vendor/xterm/xterm.js"></script>
+  <script src="vendor/xterm/addon-fit.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
