@@ -21,6 +21,7 @@
   <modules>
     <module>module-api</module>
     <module>backend</module>
+    <module>modules/multi-target-router</module>
   </modules>
 
   <build>
