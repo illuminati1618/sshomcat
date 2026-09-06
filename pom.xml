@@ -22,6 +22,7 @@
     <module>module-api</module>
     <module>backend</module>
     <module>modules/multi-target-router</module>
+    <module>modules/motd-banner</module>
   </modules>
 
   <build>
