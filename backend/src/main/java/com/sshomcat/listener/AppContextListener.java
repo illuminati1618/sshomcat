@@ -25,7 +25,8 @@ public class AppContextListener implements ServletContextListener {
             AppConfig config = AppConfig.load();
             AppServices.init(config);
             LOG.info(() -> "SSHomcat backend started. target=" + config.targetHost + ":" + config.targetPort
-                    + " hostKeyVerification=" + config.hostKeyVerification);
+                    + " hostKeyVerification=" + config.hostKeyVerification
+                    + " modules=" + AppServices.modules().modules().size());
         } catch (RuntimeException e) {
             // Fail fast and loud: an invalid/missing config should stop the webapp from coming
             // up at all, not fail confusingly on the first WebSocket connection.

@@ -1,6 +1,7 @@
 package com.sshomcat;
 
 import com.sshomcat.config.AppConfig;
+import com.sshomcat.module.ModuleLoader;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import org.apache.sshd.client.SshClient;
@@ -25,6 +26,7 @@ public final class AppServices {
     private static volatile AppConfig config;
     private static volatile SshClient sshClient;
     private static volatile ScheduledExecutorService scheduler;
+    private static volatile ModuleLoader moduleLoader;
 
     private AppServices() {
     }
@@ -55,9 +57,13 @@ public final class AppServices {
             t.setDaemon(true);
             return t;
         });
+
+        // Last, so any module's init() can safely reach config()/sshClient()/scheduler() above.
+        moduleLoader = ModuleLoader.loadFrom(cfg.modulesDirectory);
     }
 
     public static void shutdown() {
+        moduleLoader = null;
         if (scheduler != null) {
             scheduler.shutdownNow();
             scheduler = null;
@@ -91,5 +97,13 @@ public final class AppServices {
             throw new IllegalStateException("AppServices not initialized (AppContextListener didn't run?)");
         }
         return s;
+    }
+
+    public static ModuleLoader modules() {
+        ModuleLoader m = moduleLoader;
+        if (m == null) {
+            throw new IllegalStateException("AppServices not initialized (AppContextListener didn't run?)");
+        }
+        return m;
     }
 }

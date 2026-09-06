@@ -62,9 +62,25 @@ public final class SshBridge implements AutoCloseable {
      */
     public static SshBridge connect(String username, String password, Listener listener) throws IOException {
         AppConfig config = AppServices.config();
+        return connect(username, password, config.targetHost, config.targetPort, listener);
+    }
+
+    /**
+     * Same as {@link #connect(String, String, Listener)}, but against an explicit host/port
+     * rather than the default {@code AppConfig.targetHost}/{@code targetPort}. Used by
+     * {@code SshBridgeEndpoint} when a loaded {@code TargetResolver} module (see
+     * com.sshomcat.module) resolves a different target for the authenticating user -- that
+     * target is still server-side-curated, never client-supplied (docs/modules.md), so this
+     * overload doesn't weaken the docs/security.md #1 invariant, it just parameterizes it.
+     *
+     * @throws IOException same conditions as {@link #connect(String, String, Listener)}.
+     */
+    public static SshBridge connect(String username, String password, String host, int port, Listener listener)
+            throws IOException {
+        AppConfig config = AppServices.config();
         SshClient client = AppServices.sshClient();
 
-        ClientSession session = client.connect(username, config.targetHost, config.targetPort)
+        ClientSession session = client.connect(username, host, port)
                 .verify(config.sshConnectTimeoutMs)
                 .getSession();
         try {

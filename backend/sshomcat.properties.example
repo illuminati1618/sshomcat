@@ -28,3 +28,7 @@ ssh.authTimeoutMs=10000
 # known-hosts: verify against ssh.knownHostsFile (OpenSSH known_hosts format).
 ssh.hostKeyVerification=accept-all
 #ssh.knownHostsFile=/etc/sshomcat/known_hosts
+
+# Optional: directory of .jar files to load as add-on modules at startup (see docs/modules.md).
+# Absent/blank (the default) disables module loading entirely -- SSHomcat runs with zero modules.
+#modules.directory=/opt/sshomcat/modules

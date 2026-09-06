@@ -35,6 +35,10 @@ public final class AppConfig {
     public final String hostKeyVerification; // "accept-all" | "known-hosts"
     public final String knownHostsFile; // used only when hostKeyVerification == known-hosts
 
+    /** Directory of module JARs to load at startup (see com.sshomcat.module.ModuleLoader and
+     * docs/modules.md). Blank (the default) disables module loading entirely. */
+    public final String modulesDirectory;
+
     private AppConfig(Properties p) {
         this.targetHost = requireNonBlank(p, "target.host");
         this.targetPort = parseIntInRange(p, "target.port", 22, 1, 65535);
@@ -57,6 +61,8 @@ public final class AppConfig {
             throw new IllegalStateException(
                     "ssh.hostKeyVerification=known-hosts requires ssh.knownHostsFile to be set");
         }
+
+        this.modulesDirectory = p.getProperty("modules.directory", "").trim();
     }
 
     /** Loads and validates configuration. Throws {@link IllegalStateException} on any problem. */

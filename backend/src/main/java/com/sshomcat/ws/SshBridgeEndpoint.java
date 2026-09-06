@@ -2,6 +2,7 @@ package com.sshomcat.ws;
 
 import com.sshomcat.AppServices;
 import com.sshomcat.config.AppConfig;
+import com.sshomcat.module.TargetResolver;
 import com.sshomcat.ssh.SshBridge;
 import jakarta.websocket.CloseReason;
 import jakarta.websocket.CloseReason.CloseCodes;
@@ -12,6 +13,7 @@ import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -95,8 +97,25 @@ public class SshBridgeEndpoint {
         authenticated = true;
         cancelAuthGrace();
 
+        // Give any loaded TargetResolver module (com.sshomcat.module -- see docs/modules.md) a
+        // chance to pick a different, still server-side-curated target for this user; fall back
+        // to the single configured target exactly as before if none resolve anything. The
+        // username here comes from the parsed `auth` message, never a client-supplied host/port,
+        // so this doesn't touch the docs/security.md #1 invariant.
+        AppConfig config = AppServices.config();
+        String targetHost = config.targetHost;
+        int targetPort = config.targetPort;
+        for (TargetResolver resolver : AppServices.modules().modulesOfType(TargetResolver.class)) {
+            Optional<TargetResolver.Target> resolved = resolver.resolveTarget(auth.username());
+            if (resolved.isPresent()) {
+                targetHost = resolved.get().host();
+                targetPort = resolved.get().port();
+                break;
+            }
+        }
+
         try {
-            SshBridge bridge = SshBridge.connect(auth.username(), auth.password(), new SshBridge.Listener() {
+            SshBridge.Listener listener = new SshBridge.Listener() {
                 @Override
                 public void onData(byte[] bytes) {
                     sender.send(ProtocolCodec.data(bytes));
@@ -106,7 +125,8 @@ public class SshBridgeEndpoint {
                 public void onClosed() {
                     closeSession(CloseCodes.NORMAL_CLOSURE, "ssh session ended");
                 }
-            });
+            };
+            SshBridge bridge = SshBridge.connect(auth.username(), auth.password(), targetHost, targetPort, listener);
             this.sshBridge = bridge;
             sender.send(ProtocolCodec.connected());
             scheduleMaxDuration();
