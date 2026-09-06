@@ -34,7 +34,8 @@ services:
 
   backend:
     build:
-      context: ./backend
+      context: .
+      dockerfile: backend/Dockerfile
     environment:
       - CATALINA_OPTS=-Dsshomcat.config=/config/sshomcat.properties
     volumes:

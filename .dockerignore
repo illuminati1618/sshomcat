@@ -1,0 +1,6 @@
+.git
+**/target
+docs
+frontend
+proxy
+docker

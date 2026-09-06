@@ -25,13 +25,14 @@ See [`../docs/architecture.md`](../docs/architecture.md) for the component desig
 
 ## Building
 
-No local Maven install required — build in a container:
+The backend is part of the repo-root Maven build (it depends on `../module-api`). No local Maven
+install required — from the repo root, build in a container:
 
 ```sh
 docker run --rm -v "$PWD:/workspace" -w /workspace maven:3.9-eclipse-temurin-17 mvn -q -B package
 ```
 
-Produces `target/sshomcat.war`. Run the unit tests with `mvn test` (same image).
+Produces `backend/target/sshomcat.war`. Run the unit tests with `mvn test` (same image).
 
 ## Running it end-to-end locally
 
