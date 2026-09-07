@@ -114,7 +114,12 @@
 
   function wsUrl() {
     const scheme = location.protocol === "https:" ? "wss" : "ws";
-    return `${scheme}://${location.host}/ws/ssh`;
+    // Relative to wherever this page itself is being served from, not hardcoded to the
+    // domain root -- a reverse proxy that fronts sshomcat under a non-root path (e.g.
+    // /sshomcat/) still needs /ws/ssh to resolve under that same prefix, not the domain root.
+    // Served from "/" this still resolves to "/ws/ssh", unchanged from before.
+    const base = location.pathname.replace(/[^/]*$/, "");
+    return `${scheme}://${location.host}${base}ws/ssh`;
   }
 
   function connect(username, password) {
