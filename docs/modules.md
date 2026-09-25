@@ -80,3 +80,32 @@ A module is an ordinary JAR with:
 
 No SSHomcat-specific build plugin or archetype is required -- any JDK/Maven/Gradle setup that
 produces a plain JAR with that services file works.
+
+Compile against the `module-api` project in this repo (`com.sshomcat:module-api`, installed to
+your local Maven repository by `mvn install` from the repo root), with `provided` scope: the
+backend WAR already bundles it, so a module JAR should not carry its own copy. The easiest
+starting point is to copy `modules/motd-banner/` and add it to the root `pom.xml`'s `<modules>`.
+
+## Bundled modules
+
+Both live under `modules/` and build with the rest of the repo; each produces a JAR in its own
+`target/` directory (also attached to every GitHub release).
+
+### `multi-target-router`
+
+A `TargetResolver` that picks the outbound SSH target per authenticated username from an
+admin-curated allowlist file -- the "more than one configured target" item from
+[roadmap.md](roadmap.md) M3.
+
+- Allowlist path: `-DmultiTargetRouter.allowlistFile=<path>` (a JVM system property, e.g. via
+  `CATALINA_OPTS`), default `/opt/sshomcat/modules/multi-target-router.properties`.
+- Format: a Java properties file, one `username=host:port` line per user. Malformed lines are
+  logged and skipped.
+- Users with no entry get `Optional.empty()`, i.e. fall through to the default `target.host` /
+  `target.port`. A missing or unreadable file leaves the module resolving nothing.
+- The file is read once at startup; restart the webapp to pick up changes.
+
+### `motd-banner`
+
+Logs a one-line banner at startup: `-DmotdBanner.message=<text>` if set, otherwise one of a few
+built-in defaults. No other behavior -- it exists as the smallest complete module to copy from.

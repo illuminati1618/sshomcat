@@ -9,13 +9,11 @@ a live shell, rendered with [xterm.js](https://xtermjs.org/).
 
 ## Status
 
-✅ **M1 (MVP) built and verified end-to-end.** Frontend, backend, and proxy config all exist and
+**1.0.0.** The MVP (M1) is built and verified end-to-end: frontend, backend, and proxy config
 have been run together against a real SSH server — see [`docs/roadmap.md`](docs/roadmap.md) for
-what was tested and how to reproduce it (`docker-compose.dev.yml`). **If you're an agent picking
-this up next: M1's checklist is done — start with [`docs/roadmap.md`](docs/roadmap.md) M2
-(hardening) unless told otherwise.** [`docs/architecture.md`](docs/architecture.md),
-[`docs/api.md`](docs/api.md), and [`docs/security.md`](docs/security.md) are still the spec —
-keep them in sync with any change in behavior.
+what was tested and how to reproduce it (`docker-compose.dev.yml`). The M2 hardening items in the
+roadmap are still open, so read [`docs/security.md`](docs/security.md) before exposing it to
+anyone you don't trust.
 
 ## Why
 
@@ -45,17 +43,46 @@ sshomcat/
 ├── docs/                   -- start here: architecture, API contract, security model, roadmap
 ├── frontend/               -- xterm.js client (static site)
 ├── backend/                -- Java/Tomcat WAR project (the SSH bridge)
+├── module-api/             -- the add-on module contract (SshomcatModule, TargetResolver)
+├── modules/                -- bundled add-on modules (multi-target-router, motd-banner)
 ├── proxy/                  -- Apache vhost config + example (production shape)
 ├── docker/dev/             -- dev-only Apache image/config + throwaway TLS cert for local E2E testing
 ├── docker-compose.dev.yml  -- spins up sshd + backend + Apache together for local testing
+├── pom.xml                 -- root Maven build (module-api, backend, modules/*)
 └── README.md
 ```
+
+## Building
+
+Requires Java 25 and Maven 3.9+ (or use the `maven:3.9-eclipse-temurin-25` image, see
+[`backend/README.md`](backend/README.md)). From the repo root:
+
+```sh
+mvn clean verify
+```
+
+This produces `backend/target/sshomcat.war` plus one JAR per module under `modules/*/target/`.
+Prebuilt copies of all of them are attached to each
+[GitHub release](https://github.com/illuminati1618/sshomcat/releases).
+
+## Modules
+
+SSHomcat runs fine with no modules. Optional add-ons are plain JARs dropped into the directory
+named by `modules.directory`; see [`docs/modules.md`](docs/modules.md) for the contract and how
+to write one. Bundled here:
+
+- [`multi-target-router`](modules/multi-target-router) — routes each authenticated user to a
+  per-user SSH target from a small, admin-curated allowlist file, instead of the single default
+  target.
+- [`motd-banner`](modules/motd-banner) — logs a startup banner; the smallest complete example to
+  copy from.
 
 ## Docs
 
 - [`docs/architecture.md`](docs/architecture.md) — full system design, components, data flow, tech choices & why
 - [`docs/api.md`](docs/api.md) — concrete HTTP + WebSocket contract
 - [`docs/security.md`](docs/security.md) — threat model and required mitigations
+- [`docs/modules.md`](docs/modules.md) — add-on module contract, discovery, and packaging
 - [`docs/roadmap.md`](docs/roadmap.md) — phased build plan (what's V1 vs. later)
 
 ## License

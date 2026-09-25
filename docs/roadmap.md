@@ -59,8 +59,9 @@ dev — see docs/security.md "Host key verification".
 ## M3 — Stretch (explicitly not required, don't build unless asked)
 
 - [ ] Private-key-based SSH auth as an alternative to password auth.
-- [ ] Support more than one configured target (still no arbitrary client-supplied targets — a
-      small server-side allowlist, not an open relay).
+- [x] Support more than one configured target (still no arbitrary client-supplied targets — a
+      small server-side allowlist, not an open relay). Done as the optional `multi-target-router`
+      module, see [modules.md](modules.md).
 - [ ] Session audit logging.
 - [ ] Binary WebSocket framing instead of JSON+base64, if profiling shows it matters.
 - [ ] MFA / app-level auth layer.
