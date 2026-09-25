@@ -9,7 +9,7 @@ See [`../docs/architecture.md`](../docs/architecture.md) for the component desig
 
 ## Layout
 
-- `pom.xml` — Maven WAR project. Java 17, Tomcat 10.1 / Jakarta EE (Servlet 6 + WebSocket 2.1
+- `pom.xml` — Maven WAR project. Java 25, Tomcat 10.1 / Jakarta EE (Servlet 6 + WebSocket 2.1
   specs only — Tomcat is not a full EE app server, see the comment in `pom.xml`).
 - `src/main/java/com/sshomcat/`
   - `config/AppConfig.java` — loads + validates `sshomcat.properties` (fails fast on startup).
@@ -29,7 +29,7 @@ The backend is part of the repo-root Maven build (it depends on `../module-api`)
 install required — from the repo root, build in a container:
 
 ```sh
-docker run --rm -v "$PWD:/workspace" -w /workspace maven:3.9-eclipse-temurin-17 mvn -q -B package
+docker run --rm -v "$PWD:/workspace" -w /workspace maven:3.9-eclipse-temurin-25 mvn -q -B package
 ```
 
 Produces `backend/target/sshomcat.war`. Run the unit tests with `mvn test` (same image).

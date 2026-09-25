@@ -46,7 +46,7 @@ See [`proxy/sshomcat.conf.example`](../proxy/sshomcat.conf.example) for a workin
 ### 3. Backend (`backend/`)
 
 A Java WAR deployed to Tomcat. Target: **Tomcat 10.1.x** (Jakarta EE 10, `jakarta.*`
-namespace), **Java 17+**, built with **Maven** (WAR packaging).
+namespace), **Java 25+**, built with **Maven** (WAR packaging).
 
 Responsibilities:
 - `GET /api/health` — trivial liveness check, returns `{"status":"ok"}`.
