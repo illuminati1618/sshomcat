@@ -7,6 +7,9 @@ session to one specific server entirely from a web browser tab — no local SSH 
 browser extension, no VPN. You enter an SSH username and password on a page, and you're in
 a live shell, rendered with [xterm.js](https://xtermjs.org/).
 
+## Notice
+**This is a completely vibecoded project.** I made it simply because I came up with an interesting idea and architecture, and published it in case someone finds it useful :)
+
 ## Status
 
 **1.0.0.** The MVP (M1) is built and verified end-to-end: frontend, backend, and proxy config
